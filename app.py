@@ -27,8 +27,13 @@ st.markdown("""
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
     /* ---------- Global ---------- */
-    html, body, [class*="st-"] {
+    html, body, p, h1, h2, h3, h4, h5, h6, span, div, input, textarea, button, label, a {
         font-family: 'Outfit', sans-serif;
+    }
+    /* Preserve Streamlit's icon fonts */
+    .stExpander [data-testid="stExpanderToggleIcon"],
+    [data-testid="stIconMaterial"] {
+        font-family: 'Material Symbols Rounded', sans-serif !important;
     }
     .stApp {
         background: linear-gradient(145deg, #0f0c29, #1a1a40, #24243e);
@@ -51,22 +56,13 @@ st.markdown("""
         margin-bottom: 2rem;
     }
 
-    /* ---------- Glass card ---------- */
-    .glass-card {
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 16px;
-        padding: 2rem 2.4rem;
-        backdrop-filter: blur(12px);
-        margin-bottom: 1.5rem;
-    }
-
     /* ---------- Result cards ---------- */
     .result-card {
         border-radius: 16px;
         padding: 2rem 2.4rem;
         text-align: center;
         animation: fadeUp 0.5s ease-out;
+        margin-bottom: 0.5rem;
     }
     @keyframes fadeUp {
         from { opacity: 0; transform: translateY(18px); }
@@ -197,34 +193,33 @@ sample = st.session_state.get("sample", {})
 # ──────────────────────────────────────────────────────────────
 # Input form
 # ──────────────────────────────────────────────────────────────
-st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-st.markdown('<p class="section-header">📝 Job Posting Details</p>',
-            unsafe_allow_html=True)
+# Use Streamlit's native container to avoid broken HTML div wrapping
+with st.container(border=True):
+    st.markdown('<p class="section-header">📝 Job Posting Details</p>',
+                unsafe_allow_html=True)
 
-title = st.text_input("Job Title", value=sample.get("title", ""),
-                       placeholder="e.g. Senior Data Analyst")
+    title = st.text_input("Job Title", value=sample.get("title", ""),
+                           placeholder="e.g. Senior Data Analyst")
 
-company_profile = st.text_area(
-    "Company Profile", value=sample.get("company_profile", ""),
-    height=80, placeholder="Brief description of the company …",
-)
+    company_profile = st.text_area(
+        "Company Profile", value=sample.get("company_profile", ""),
+        height=80, placeholder="Brief description of the company …",
+    )
 
-description = st.text_area(
-    "Job Description", value=sample.get("description", ""),
-    height=140, placeholder="Describe the role and responsibilities …",
-)
+    description = st.text_area(
+        "Job Description", value=sample.get("description", ""),
+        height=140, placeholder="Describe the role and responsibilities …",
+    )
 
-requirements = st.text_area(
-    "Requirements", value=sample.get("requirements", ""),
-    height=100, placeholder="Required skills and qualifications …",
-)
+    requirements = st.text_area(
+        "Requirements", value=sample.get("requirements", ""),
+        height=100, placeholder="Required skills and qualifications …",
+    )
 
-benefits = st.text_area(
-    "Benefits", value=sample.get("benefits", ""),
-    height=80, placeholder="Salary, perks, work-from-home policy …",
-)
-
-st.markdown("</div>", unsafe_allow_html=True)
+    benefits = st.text_area(
+        "Benefits", value=sample.get("benefits", ""),
+        height=80, placeholder="Salary, perks, work-from-home policy …",
+    )
 
 # ──────────────────────────────────────────────────────────────
 # Analyze button & results
@@ -276,7 +271,7 @@ if analyze:
         )
 
         # Expandable detail
-        with st.expander("📊 Detailed Scores"):
+        with st.expander("Detailed Scores", icon="📊"):
             st.metric("Prediction", result["label"])
             st.metric("Confidence", confidence_pct)
             st.metric("P(Fake)", f"{result['probability']:.1%}")
